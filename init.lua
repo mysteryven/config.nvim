@@ -100,6 +100,7 @@ vim.g.have_nerd_font = true
 
 -- Make line numbers default
 vim.opt.number = true
+vim.wo.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.opt.relativenumber = true
@@ -192,7 +193,7 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-vim.keymap.set('n', '<C-n>', ':Neotree position=right<CR>', { desc = 'Open Neotree' })
+vim.keymap.set('n', '<C-n>', ':Neotree position=right reveal <CR>', { desc = 'Open Neotree' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -259,6 +260,7 @@ require('lazy').setup({
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
       },
+      current_line_blame = true,
     },
   },
 
