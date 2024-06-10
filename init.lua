@@ -206,10 +206,12 @@ vim.keymap.set('n', '<C-n>', ':Neotree position=right reveal <CR>', { desc = 'Op
 vim.keymap.set('i', '<C-l>', '<C-Space><C-n>', { desc = 'Accept one word in copilot' })
 vim.keymap.set('i', '<C-L>', '<Plug>(copilot-accept-word)', { desc = 'Accept one word in copilot' })
 
-require '/lua/custom/user/switch_case'
-vim.api.nvim_set_keymap('n', '<Leader>cu', '<cmd>lua require("/lua/custom/user/switch_case").switch_case()<CR>', {
-  desc = 'switch CamelCase/snake_case',
-})
+-- Get the absolute path to your Neovim configuration directory
+local nvim_config_dir = vim.fn.stdpath 'config'
+
+package.path = package.path .. ';' .. nvim_config_dir .. '/user/?.lua' .. ';' .. nvim_config_dir .. '/user/?/init.lua'
+
+vim.keymap.set('n', '<leader>cu', ':lua require("custom.user.switch_case").switch_case()<CR>', { desc = 'Switch camelCase/snake_case' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -378,7 +380,7 @@ require('lazy').setup({
       -- many different aspects of Neovim, your workspace, LSP, and more!
       --
       -- The easiest way to use Telescope, is to start by doing something like:
-      --  :Telescope help_tags
+      --    :Telescope help_tags
       --
       -- After running this command, a window will open up and you're able to
       -- type in the prompt window. You'll see a list of `help_tags` options and
@@ -415,7 +417,6 @@ require('lazy').setup({
         },
         pickers = {
           ignore_current_buffer = true,
-          sort_lastused = true,
         },
         extensions = {
           ['ui-select'] = {
@@ -430,6 +431,7 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
+
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -439,7 +441,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader><leader>', function()
+        builtin.buffers { sort_lastused = true }
+      end, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
