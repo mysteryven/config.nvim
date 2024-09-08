@@ -168,11 +168,19 @@ vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 -- not auto fold file when I first open it
 vim.opt.foldlevel = 99
 
+-- Set default indentation settings
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 4
+vim.opt.tabstop = 4
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+-- switch relative line number
+vim.keymap.set('n', '<leader>cl', ':set relativenumber!<CR>', { desc = 'Toggle relative line number' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -198,12 +206,17 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<C-n>', ':Neotree position=right toggle reveal <CR>', { desc = 'Open Neotree' })
 
-vim.keymap.set('n', '<C-n>', ':Neotree position=right reveal <CR>', { desc = 'Open Neotree' })
+-- Copilot setup.
+vim.g.copilot_assume_mapped = true
 
--- custom keymaps:
--- set ctrl + L to accpet one word in copilot
-vim.keymap.set('i', '<C-L>', '<Plug>(copilot-accept-word)', { desc = 'Accept one word in copilot' })
+-- Accept the current completion word with Ctrl-/.
+vim.keymap.set('i', '<C-}>', '<Plug>(copilot-accept-word)')
+-- Accept the current completion line with Ctrl-|.
+vim.keymap.set('i', '<C-|>', '<Plug>(copilot-accept-line)')
+-- Request a suggestion with Ctrl-.
+vim.keymap.set('i', '<C-.>', '<Plug>(copilot-suggest)')
 
 -- Get the absolute path to your Neovim configuration directory
 local nvim_config_dir = vim.fn.stdpath 'config'
@@ -308,6 +321,17 @@ require('lazy').setup({
         map('x', 'ih', ':<C-U>Gitsigns select_hunk<CR>')
       end,
     },
+    {
+      'MysticalDevil/inlay-hints.nvim',
+      event = 'LspAttach',
+      dependencies = { 'neovim/nvim-lspconfig' },
+      config = function()
+        require('inlay-hints').setup {
+          commands = { enable = true }, -- Enable InlayHints commands, include `InlayHintsToggle`, `InlayHintsEnable` and `InlayHintsDisable`
+          autocmd = { enable = true }, -- Enable the inlay hints on `LspAttach` event
+        }
+      end,
+    },
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -331,16 +355,24 @@ require('lazy').setup({
     config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup()
 
-      -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = '[H]unk', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>g'] = { name = '[G]et', _ = 'which_key_ignore' },
+      local wk = require 'which-key'
+      wk.add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>c_', hidden = true },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>d_', hidden = true },
+        { '<leader>g', group = '[G]et' },
+        { '<leader>g_', hidden = true },
+        { '<leader>h', group = '[H]unk' },
+        { '<leader>h_', hidden = true },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>r_', hidden = true },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>s_', hidden = true },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>t_', hidden = true },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>w_', hidden = true },
       }
     end,
   },
@@ -443,7 +475,7 @@ require('lazy').setup({
 
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>/', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -456,7 +488,7 @@ require('lazy').setup({
       end, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
+      vim.keymap.set('n', '<leader>sc', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
           winblend = 10,
@@ -616,9 +648,9 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
+        clangd = {},
+        gopls = {},
+        pyright = {},
         rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -664,6 +696,10 @@ require('lazy').setup({
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
+            -- if server_name is rust_analyzer, then need avoid to set up capabilities
+            if server_name == 'rust_analyzer' then
+              return true
+            end
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
