@@ -1,4 +1,4 @@
---[[
+--[[initinit
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
@@ -169,9 +169,9 @@ vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 vim.opt.foldlevel = 99
 
 -- Set default indentation settings
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 4
-vim.opt.tabstop = 4
+-- vim.opt.expandtab = true
+-- vim.opt.shiftwidth = 4
+-- vim.opt.tabstop = 4
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
@@ -206,7 +206,7 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<C-n>', ':Neotree position=right toggle reveal <CR>', { desc = 'Open Neotree' })
+vim.keymap.set('n', '<C-b>', ':Neotree position=right toggle reveal <CR>', { desc = 'Open Neotree' })
 
 -- Copilot setup.
 vim.g.copilot_assume_mapped = true
@@ -224,6 +224,8 @@ local nvim_config_dir = vim.fn.stdpath 'config'
 package.path = package.path .. ';' .. nvim_config_dir .. '/user/?.lua' .. ';' .. nvim_config_dir .. '/user/?/init.lua'
 
 vim.keymap.set('n', '<leader>cu', ':lua require("custom.user.switch_case").switch_case()<CR>', { desc = 'Switch camelCase/snake_case' })
+-- add clang switch header/source file use command `:ClangdSwitchSourceHeader`
+vim.keymap.set('n', '<leader>gs', ':ClangdSwitchSourceHeader<CR>', { noremap = true, silent = true, desc = 'switch header/source file in c++' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -260,6 +262,24 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  {
+    'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
+      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+    },
+    init = function()
+      vim.g.barbar_auto_setup = false
+    end,
+    opts = {
+      -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
+      -- animation = true,
+      -- insert_at_start = true,
+      -- …etc.
+    },
+    version = '^1.0.0', -- optional: only update when a new 1.x version is released
+  },
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -280,8 +300,56 @@ require('lazy').setup({
   --    require('gitsigns').setup({ ... })
   --
   -- See `:help gitsigns` to understand what the configuration keys do
-  { -- Adds git related signs to the gutter, as well as utilities for managing changes
+  {
+    'f-person/git-blame.nvim',
+    event = 'VeryLazy',
+    config = function()
+      vim.keymap.set('n', '<leader>gc', '<cmd>GitBlameOpenCommitURL<CR>', { desc = 'Open commit URL' })
+      vim.keymap.set('n', '<leader>gf', '<cmd>GitBlameOpenFileURL<CR>', { desc = 'Open file URL' })
+    end,
+  },
+  {
+    'airblade/vim-gitgutter',
+    lazy = false,
+    config = function()
+      vim.g.gitgutter_signs = 1
+      vim.g.gitgutter_map_keys = 0 -- Disable default key mappings
+
+      -- Signs configuration
+      vim.g.gitgutter_sign_added = '+'
+      vim.g.gitgutter_sign_modified = '~'
+      vim.g.gitgutter_sign_removed = '_'
+      vim.g.gitgutter_sign_removed_first_line = '‾'
+      vim.g.gitgutter_sign_modified_removed = '~'
+
+      -- Function to map keys
+      local function map(mode, lhs, rhs, opts)
+        opts = vim.tbl_extend('force', { noremap = true, silent = true }, opts or {})
+        vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
+      end
+
+      -- Navigation
+      map('n', ']c', "&diff ? ']c' : '<cmd>GitGutterNextHunk<CR>'", { expr = true })
+      map('n', '[c', "&diff ? '[c' : '<cmd>GitGutterPrevHunk<CR>'", { expr = true })
+
+      -- Actions
+      map('n', '<leader>hs', ':GitGutterStageHunk<CR>')
+      map('v', '<leader>hs', ':GitGutterStageHunk<CR>')
+      map('n', '<leader>hr', ':GitGutterUndoHunk<CR>')
+      map('v', '<leader>hr', ':GitGutterUndoHunk<CR>')
+      map('n', '<leader>hS', '<cmd>GitGutterStageBuffer<CR>')
+      map('n', '<leader>hu', '<cmd>GitGutterUndoHunk<CR>')
+      map('n', '<leader>hR', '<cmd>GitGutterResetBuffer<CR>')
+      map('n', '<leader>hp', '<cmd>GitGutterPreviewHunk<CR>')
+      map('n', '<leader>hb', '<cmd>GitGutterBlameLine<CR>')
+      map('n', '<leader>hd', '<cmd>GitGutterDiffPopup<CR>')
+      map('n', '<leader>hD', '<cmd>GitGutterPreviewHunk "~"<CR>')
+      map('n', '<leader>td', '<cmd>GitGutterToggle<CR>')
+    end,
+  },
+  {
     'lewis6991/gitsigns.nvim',
+    lazy = false,
     opts = {
       signs = {
         add = { text = '+' },
@@ -321,6 +389,7 @@ require('lazy').setup({
         map('x', 'ih', ':<C-U>Gitsigns select_hunk<CR>')
       end,
     },
+
     {
       'MysticalDevil/inlay-hints.nvim',
       event = 'LspAttach',
@@ -481,7 +550,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep with [A]rgs' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+      vim.keymap.set('n', '<leader>b', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', function()
         builtin.buffers { sort_lastused = true }
@@ -652,13 +721,14 @@ require('lazy').setup({
         gopls = {},
         pyright = {},
         rust_analyzer = {},
+        eslint_d = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        ts_ls = {},
         --
 
         lua_ls = {
@@ -709,6 +779,8 @@ require('lazy').setup({
           end,
         },
       }
+
+      require('lspconfig').eslint.setup {}
     end,
   },
 
@@ -746,7 +818,7 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        -- javascript = { { 'eslint_d' } },
       },
     },
   },
