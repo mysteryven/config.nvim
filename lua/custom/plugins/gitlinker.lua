@@ -1,4 +1,4 @@
 return {
-    'ruifm/gitlinker.nvim',
-    config = true,
+  'ruifm/gitlinker.nvim',
+  config = true,
 }

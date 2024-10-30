@@ -262,23 +262,23 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
-  {
-    'romgrk/barbar.nvim',
-    dependencies = {
-      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
-      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
-    },
-    init = function()
-      vim.g.barbar_auto_setup = false
-    end,
-    opts = {
-      -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
-      -- animation = true,
-      -- insert_at_start = true,
-      -- …etc.
-    },
-    version = '^1.0.0', -- optional: only update when a new 1.x version is released
-  },
+  -- {
+  --   'romgrk/barbar.nvim',
+  --   dependencies = {
+  --     'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
+  --     'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+  --   },
+  --   init = function()
+  --     vim.g.barbar_auto_setup = false
+  --   end,
+  --   opts = {
+  --     -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
+  --     -- animation = true,
+  --     -- insert_at_start = true,
+  --     -- …etc.
+  --   },
+  --   version = '^1.0.0', -- optional: only update when a new 1.x version is released
+  -- },
 
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
@@ -389,7 +389,30 @@ require('lazy').setup({
         map('x', 'ih', ':<C-U>Gitsigns select_hunk<CR>')
       end,
     },
+    {
+      'L3MON4D3/LuaSnip',
+      event = 'InsertEnter',
+      config = function()
+        local ls = require 'luasnip'
+        local s = ls.snippet
+        local t = ls.text_node
 
+        -- Define the snippet "ab" to insert "A\nB"
+        ls.add_snippets('cpp', {
+          s('sw', {
+            t {
+              'SPDLOG_WARN("Hello");',
+            },
+          }),
+          s('swt', {
+            t {
+              'std::this_thread::sleep_for(std::chrono::seconds(1));',
+              'SPDLOG_WARN("Hello");',
+            },
+          }),
+        })
+      end,
+    },
     {
       'MysticalDevil/inlay-hints.nvim',
       event = 'LspAttach',
@@ -547,7 +570,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>/', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>.', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep with [A]rgs' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>b', builtin.resume, { desc = '[S]earch [R]esume' })
@@ -567,17 +590,22 @@ require('lazy').setup({
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>s/', function()
-        builtin.live_grep {
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-        }
-      end, { desc = '[S]earch [/] in Open Files' })
+      -- vim.keymap.set('n', '<leader>/', function()
+      --   builtin.live_grep {
+      --     grep_open_files = true,
+      --     prompt_title = 'Live Grep in Open Files',
+      --   }
+      -- end, { desc = '[S]earch [/] in Open Files' })
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
+
+      -- run :Telescope treesitter
+      vim.keymap.set('n', '<leader>sm', function()
+        builtin.treesitter()
+      end, { desc = '[S]earch [M]ethods' })
     end,
   },
 
@@ -791,7 +819,7 @@ require('lazy').setup({
     keys = {
       {
         -- Customize or remove this keymap to your liking
-        '<leader>cf',
+        '<leader>f',
         function()
           require('conform').format { async = true, lsp_fallback = true }
         end,
@@ -818,7 +846,7 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { 'eslint_d' } },
+        javascript = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
       },
     },
   },
@@ -939,7 +967,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'tokyonight-moon'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
