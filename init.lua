@@ -178,6 +178,8 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>o', ':copen<CR>', { desc = ':c[o]pen' })
+vim.keymap.set('n', '<leader>x', ':bd<CR>', { desc = 'Close current buffer [X]' })
 
 -- switch relative line number
 vim.keymap.set('n', '<leader>cl', ':set relativenumber!<CR>', { desc = 'Toggle relative line number' })
@@ -225,7 +227,7 @@ package.path = package.path .. ';' .. nvim_config_dir .. '/user/?.lua' .. ';' ..
 
 vim.keymap.set('n', '<leader>cu', ':lua require("custom.user.switch_case").switch_case()<CR>', { desc = 'Switch camelCase/snake_case' })
 -- add clang switch header/source file use command `:ClangdSwitchSourceHeader`
-vim.keymap.set('n', '<leader>gs', ':ClangdSwitchSourceHeader<CR>', { noremap = true, silent = true, desc = 'switch header/source file in c++' })
+vim.keymap.set('n', '<leader>js', ':ClangdSwitchSourceHeader<CR>', { noremap = true, silent = true, desc = '[j]ump header or source file in c++' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -317,7 +319,7 @@ require('lazy').setup({
 
       -- Signs configuration
       vim.g.gitgutter_sign_added = '+'
-      vim.g.gitgutter_sign_modified = '~'
+      vim.g.gitgutter_sign_modified = '.'
       vim.g.gitgutter_sign_removed = '_'
       vim.g.gitgutter_sign_removed_first_line = '‾'
       vim.g.gitgutter_sign_modified_removed = '~'
@@ -334,16 +336,10 @@ require('lazy').setup({
 
       -- Actions
       map('n', '<leader>hs', ':GitGutterStageHunk<CR>')
-      map('v', '<leader>hs', ':GitGutterStageHunk<CR>')
       map('n', '<leader>hr', ':GitGutterUndoHunk<CR>')
-      map('v', '<leader>hr', ':GitGutterUndoHunk<CR>')
       map('n', '<leader>hS', '<cmd>GitGutterStageBuffer<CR>')
       map('n', '<leader>hu', '<cmd>GitGutterUndoHunk<CR>')
-      map('n', '<leader>hR', '<cmd>GitGutterResetBuffer<CR>')
       map('n', '<leader>hp', '<cmd>GitGutterPreviewHunk<CR>')
-      map('n', '<leader>hb', '<cmd>GitGutterBlameLine<CR>')
-      map('n', '<leader>hd', '<cmd>GitGutterDiffPopup<CR>')
-      map('n', '<leader>hD', '<cmd>GitGutterPreviewHunk "~"<CR>')
       map('n', '<leader>td', '<cmd>GitGutterToggle<CR>')
     end,
   },
@@ -465,6 +461,7 @@ require('lazy').setup({
         { '<leader>t_', hidden = true },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>w_', hidden = true },
+        { '<leader>m', group = 'Book[m]ark' },
       }
     end,
   },
@@ -967,7 +964,8 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-moon'
+      -- vim.cmd.colorscheme 'tokyonight-moon'
+      vim.cmd.colorscheme 'minicyan'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
