@@ -208,7 +208,7 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<C-b>', ':Neotree position=right toggle reveal <CR>', { desc = 'Open Neotree' })
+vim.keymap.set('n', '<leader>n', ':Neotree position=right toggle reveal <CR>', { desc = 'Open Neotree' })
 
 -- Copilot setup.
 vim.g.copilot_assume_mapped = true
