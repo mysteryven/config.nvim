@@ -1,8 +1,15 @@
 return {
-  "junegunn/fzf.vim",
-  version = "*",
-  dependencies = {
+  {
+    'kevinhwang91/nvim-bqf',
+    dependencies = { 'junegunn/fzf', 'junegunn/fzf.vim' },
+    -- optional: add opts = {} if you want to configure `nvim-bqf` specifically
   },
-  config = function ()
-  end,
+  {
+    'junegunn/fzf', -- This installs the FZF binary
+    build = './install --bin',
+  },
+  {
+    'junegunn/fzf.vim',
+    version = '*', -- Pin to the latest stable version
+  },
 }

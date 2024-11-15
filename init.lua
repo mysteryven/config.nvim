@@ -337,11 +337,11 @@ require('lazy').setup({
 
       -- Actions
       map('n', '<leader>hs', ':GitGutterStageHunk<CR>')
-      map('n', '<leader>hr', ':GitGutterUndoHunk<CR>')
       map('n', '<leader>hS', '<cmd>GitGutterStageBuffer<CR>')
       map('n', '<leader>hu', '<cmd>GitGutterUndoHunk<CR>')
       map('n', '<leader>hp', '<cmd>GitGutterPreviewHunk<CR>')
-      map('n', '<leader>td', '<cmd>GitGutterToggle<CR>')
+      map('n', '<leader>hb', ':GitGutterSignsToggle<CR>')
+      map('n', '<leader>hg', ':GitGutterQuickFix<CR>:copen<CR>')
     end,
   },
   {
