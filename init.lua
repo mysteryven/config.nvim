@@ -308,6 +308,7 @@ require('lazy').setup({
     config = function()
       vim.keymap.set('n', '<leader>gc', '<cmd>GitBlameOpenCommitURL<CR>', { desc = 'Open commit URL' })
       vim.keymap.set('n', '<leader>gf', '<cmd>GitBlameOpenFileURL<CR>', { desc = 'Open file URL' })
+      vim.keymap.set('n', '<leader>tb', '<cmd>GitBlameToggle<CR>', { desc = '[T]oggle git [B]lame' })
     end,
   },
   {
@@ -462,6 +463,11 @@ require('lazy').setup({
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>w_', hidden = true },
         { '<leader>m', group = 'Book[m]ark' },
+        { '<leader>m_', hidden = true },
+        { '<leader>a', group = '[A]i' },
+        { '<leader>a_', hidden = true },
+        { '<leader>j', group = '[J]ump' },
+        { '<leader>j_', hidden = true },
       }
     end,
   },
