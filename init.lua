@@ -209,6 +209,7 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 vim.keymap.set('n', '<leader>n', ':Neotree position=right toggle reveal <CR>', { desc = 'Open Neotree' })
+vim.keymap.set('n', '<leader>v', ':Neogit <CR>', { desc = 'Open version controll' })
 
 -- Copilot setup.
 vim.g.copilot_assume_mapped = true
