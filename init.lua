@@ -221,6 +221,17 @@ vim.keymap.set('i', '<C-|>', '<Plug>(copilot-accept-line)')
 -- Request a suggestion with Ctrl-.
 vim.keymap.set('i', '<C-.>', '<Plug>(copilot-suggest)')
 
+-- Restore cursor to file position in previous editing session
+vim.api.nvim_create_autocmd('BufReadPost', {
+  callback = function(args)
+    local mark = vim.api.nvim_buf_get_mark(args.buf, '"')
+    local line_count = vim.api.nvim_buf_line_count(args.buf)
+    if mark[1] > 0 and mark[1] <= line_count then
+      vim.cmd 'normal! g`"zz'
+    end
+  end,
+})
+
 -- Get the absolute path to your Neovim configuration directory
 local nvim_config_dir = vim.fn.stdpath 'config'
 
@@ -397,15 +408,15 @@ require('lazy').setup({
 
         -- Define the snippet "ab" to insert "A\nB"
         ls.add_snippets('cpp', {
-          s('sw', {
+          s('dbg', {
             t {
-              'SPDLOG_WARN("Hello");',
+              'SPDLOG_WARN("----");',
             },
           }),
-          s('swt', {
+          s('dbgt', {
             t {
               'std::this_thread::sleep_for(std::chrono::seconds(1));',
-              'SPDLOG_WARN("Hello");',
+              'SPDLOG_WARN("----");',
             },
           }),
         })
@@ -850,7 +861,8 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        javascript = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
+        javascript = { 'prettier', 'eslint', stop_after_first = true },
+        yaml = { 'prettier' },
       },
     },
   },
@@ -972,7 +984,8 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight-moon'
-      vim.cmd.colorscheme 'minicyan'
+      -- 'minicyan'
+      vim.cmd.colorscheme 'kanagawa'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'

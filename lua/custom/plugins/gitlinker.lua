@@ -1,4 +1,18 @@
 return {
-  'ruifm/gitlinker.nvim',
-  config = true,
+  {
+    'pwntester/octo.nvim',
+    requires = {
+      'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope.nvim',
+      -- OR 'ibhagwan/fzf-lua',
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('octo').setup()
+    end,
+  },
+  {
+    'ruifm/gitlinker.nvim',
+    config = true,
+  },
 }
