@@ -548,7 +548,6 @@ require('lazy').setup({
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
-        --
         defaults = {
           mappings = {
             i = {
@@ -561,9 +560,40 @@ require('lazy').setup({
               ['dd'] = actions.delete_buffer,
             },
           },
+          file_ignore_patterns = {
+            'node_modules',
+            'build',
+            'dist',
+          },
+          vimgrep_arguments = {
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--hidden',
+          },
         },
         pickers = {
           ignore_current_buffer = true,
+          find_files = {
+            hidden = true,
+            -- needed to exclude some files & dirs from general search
+            -- when not included or specified in .gitignore
+            find_command = {
+              'rg',
+              '--files',
+              '--hidden',
+              '--glob=!**/.git/*',
+              '--glob=!**/.idea/*',
+              '--glob=!**/.vscode/*',
+              '--glob=!**/build/*',
+              '--glob=!**/dist/*',
+              '--glob=!**/node_modules/*',
+            },
+          },
         },
         extensions = {
           ['ui-select'] = {
@@ -765,6 +795,9 @@ require('lazy').setup({
         pyright = {},
         rust_analyzer = {},
         eslint_d = {},
+        cssls = {},
+        html = {},
+        -- ...
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
