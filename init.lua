@@ -793,7 +793,7 @@ require('lazy').setup({
         clangd = {},
         gopls = {},
         pyright = {},
-        rust_analyzer = {},
+        -- rust_analyzer = {},
         eslint_d = {},
         cssls = {},
         html = {},
@@ -840,12 +840,14 @@ require('lazy').setup({
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
+        ensure_installed = {},
+        automatic_installation = false,
         handlers = {
           function(server_name)
             -- if server_name is rust_analyzer, then need avoid to set up capabilities
-            -- if server_name == 'rust_analyzer' then
-            --   return true
-            -- end
+            if server_name == 'rust_analyzer' then
+              return true
+            end
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
@@ -894,8 +896,9 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        javascript = { 'prettier', 'eslint', stop_after_first = true },
         yaml = { 'prettier' },
+        cpp = { 'clang-format', 'uncrustify', 'astyle' },
+        javascript = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
       },
     },
   },
