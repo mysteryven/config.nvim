@@ -560,41 +560,36 @@ require('lazy').setup({
               ['dd'] = actions.delete_buffer,
             },
           },
-          file_ignore_patterns = {
-            'node_modules',
-            'build',
-            'dist',
-          },
-          vimgrep_arguments = {
-            'rg',
-            '--color=never',
-            '--no-heading',
-            '--with-filename',
-            '--line-number',
-            '--column',
-            '--smart-case',
-            '--hidden',
-          },
+          -- vimgrep_arguments = {
+          --   'rg',
+          --   '--color=never',
+          --   '--no-heading',
+          --   '--with-filename',
+          --   '--line-number',
+          --   '--column',
+          --   '--smart-case',
+          --   '--hidden',
+          -- },
         },
-        pickers = {
-          ignore_current_buffer = true,
-          find_files = {
-            hidden = true,
-            -- needed to exclude some files & dirs from general search
-            -- when not included or specified in .gitignore
-            find_command = {
-              'rg',
-              '--files',
-              '--hidden',
-              '--glob=!**/.git/*',
-              '--glob=!**/.idea/*',
-              '--glob=!**/.vscode/*',
-              '--glob=!**/build/*',
-              '--glob=!**/dist/*',
-              '--glob=!**/node_modules/*',
-            },
-          },
-        },
+        -- pickers = {
+        --   ignore_current_buffer = true,
+        --   find_files = {
+        --     hidden = true,
+        --     -- needed to exclude some files & dirs from general search
+        --     -- when not included or specified in .gitignore
+        --     find_command = {
+        --       'rg',
+        --       '--files',
+        --       '--hidden',
+        --       '--glob=!**/.git/*',
+        --       '--glob=!**/.idea/*',
+        --       '--glob=!**/.vscode/*',
+        --       '--glob=!**/build/*',
+        --       '--glob=!**/dist/*',
+        --       '--glob=!**/node_modules/*',
+        --     },
+        --   },
+        -- },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
