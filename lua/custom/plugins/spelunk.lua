@@ -21,6 +21,7 @@ return {
           search_bookmarks = '<leader>mf',
           -- Fuzzy-find bookmarks in current stack
           search_current_bookmarks = '<leader>mc',
+          search_stacks = '<leader>ms',
         },
         window_mappings = {
           -- Move the UI cursor down

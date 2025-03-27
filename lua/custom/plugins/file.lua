@@ -22,7 +22,7 @@ return {
   {
     'mbbill/undotree',
     config = function()
-      vim.keymap.set('n', '<leader><F5>', vim.cmd.UndotreeToggle)
+      vim.keymap.set('n', '<leader>hl', vim.cmd.UndotreeToggle, { noremap = true, desc = 'list undo history' })
     end,
   },
   {
