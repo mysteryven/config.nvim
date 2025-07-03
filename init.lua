@@ -1017,6 +1017,7 @@ require('lazy').setup({
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight-moon'
       -- 'minicyan'
+      -- 'kanagawa'
       vim.cmd.colorscheme 'kanagawa'
 
       -- You can configure highlights by doing something like:

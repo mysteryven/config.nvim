@@ -1,4 +1,4 @@
 return {
-  'axkirillov/hbac.nvim',
-  config = true,
+  -- 'axkirillov/hbac.nvim',
+  -- config = true,
 }

@@ -4,6 +4,13 @@ return {
     config = true,
   },
   {
+    'rhysd/git-messenger.vim',
+    config = function()
+      vim.g.git_messenger_no_default_mappings = 1
+      vim.api.nvim_set_keymap('n', '<leader>gm', ':GitMessenger<CR>', { noremap = true, silent = true, desc = 'Git Messenger' })
+    end,
+  },
+  {
     'pwntester/octo.nvim',
     requires = {
       'nvim-lua/plenary.nvim',
