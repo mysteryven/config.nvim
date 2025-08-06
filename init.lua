@@ -181,6 +181,24 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<leader>o', ':copen<CR>', { desc = ':c[o]pen' })
 vim.keymap.set('n', '<leader>x', ':bd<CR>', { desc = 'Close current buffer [X]' })
 
+vim.api.nvim_create_user_command('Rv', function(opts)
+  local args = vim.split(opts.args, ' ')
+  local query = args[1]
+  local globs = vim.list_slice(args, 2) -- everything after the first word
+
+  -- build --glob "...", --glob "..." ...
+  local glob_args = ''
+  for _, g in ipairs(globs) do
+    glob_args = glob_args .. '--glob "' .. g .. '" '
+  end
+
+  -- construct full rg command prefix
+  local cmd_prefix = 'rg --column --line-number --no-heading --color=always --smart-case ' .. glob_args
+
+  -- call fzf#vim#grep2
+  vim.fn['fzf#vim#grep2'](cmd_prefix, query)
+end, { nargs = '+', complete = 'file' })
+
 -- switch relative line number
 vim.keymap.set('n', '<leader>cl', ':set relativenumber!<CR>', { desc = 'Toggle relative line number' })
 
@@ -498,12 +516,6 @@ require('lazy').setup({
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      {
-        'nvim-telescope/telescope-live-grep-args.nvim',
-        -- This will not install any breaking changes.
-        -- For major updates, this must be adjusted manually.
-        version = '^1.0.0',
-      },
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
         'nvim-telescope/telescope-fzf-native.nvim',
 
@@ -519,8 +531,11 @@ require('lazy').setup({
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
-      -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      {
+        'nvim-telescope/telescope-live-grep-args.nvim',
+        version = '^1.0.0',
+      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -543,6 +558,7 @@ require('lazy').setup({
       -- do as well as how to actually do it!
       --
       local actions = require 'telescope.actions'
+      local lga_actions = require 'telescope-live-grep-args.actions'
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
@@ -572,28 +588,40 @@ require('lazy').setup({
           --   '--hidden',
           -- },
         },
-        -- pickers = {
-        --   ignore_current_buffer = true,
-        --   find_files = {
-        --     hidden = true,
-        --     -- needed to exclude some files & dirs from general search
-        --     -- when not included or specified in .gitignore
-        --     find_command = {
-        --       'rg',
-        --       '--files',
-        --       '--hidden',
-        --       '--glob=!**/.git/*',
-        --       '--glob=!**/.idea/*',
-        --       '--glob=!**/.vscode/*',
-        --       '--glob=!**/build/*',
-        --       '--glob=!**/dist/*',
-        --       '--glob=!**/node_modules/*',
-        --     },
-        --   },
-        -- },
+        pickers = {
+          ignore_current_buffer = true,
+          find_files = {
+            hidden = true,
+            no_ignore = true,
+            no_ignore_parent = true,
+            -- needed to exclude some files & dirs from general search
+            -- when not included or specified in .gitignore
+            find_command = {
+              'rg',
+              '--files',
+              '--no-ignore',
+              '--no-ignore-parent',
+              '--hidden',
+              '--glob=!**/.git/*',
+              '--glob=!**/.idea/*',
+              '--glob=!**/.vscode/*',
+              '--glob=!**/build/*',
+              '--glob=!**/dist/*',
+              '--glob=!**/node_modules/*',
+            },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
+          },
+          ['live_grep_args'] = {
+            mappings = {
+              i = {
+                ['<C-k>'] = lga_actions.quote_prompt(),
+                ['<C-i>'] = lga_actions.quote_prompt { postfix = ' --iglob ' },
+              },
+            },
           },
         },
       }
