@@ -818,7 +818,7 @@ require('lazy').setup({
         gopls = {},
         pyright = {},
         -- rust_analyzer = {},
-        eslint_d = {},
+        eslint = {},
         cssls = {},
         html = {},
         -- ...
@@ -865,24 +865,17 @@ require('lazy').setup({
 
       require('mason-lspconfig').setup {
         ensure_installed = {},
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            -- if server_name is rust_analyzer, then need avoid to set up capabilities
-            if server_name == 'rust_analyzer' then
-              return true
-            end
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        automatic_enable = false,
       }
 
-      require('lspconfig').eslint.setup {}
+      for server_name, server in pairs(servers) do
+        if server_name ~= 'rust_analyzer' then
+          local merged_capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+          local resolved = vim.tbl_deep_extend('force', {}, server, { capabilities = merged_capabilities })
+          vim.lsp.config(server_name, resolved)
+          vim.lsp.enable(server_name)
+        end
+      end
     end,
   },
 
@@ -903,16 +896,7 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        }
-      end,
+      format_on_save = false,
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -923,6 +907,9 @@ require('lazy').setup({
         yaml = { 'prettier' },
         cpp = { 'clang-format', 'uncrustify', 'astyle' },
         javascript = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
       },
     },
   },
@@ -996,6 +983,26 @@ require('lazy').setup({
           --  This will expand snippets if the LSP sent a snippet.
           ['<C-y>'] = cmp.mapping.confirm { select = true },
 
+          ['<Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.confirm { select = true }
+            elseif luasnip.expand_or_locally_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+
+          ['<S-Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.locally_jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
@@ -1024,6 +1031,7 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
+          { name = 'copilot', group_index = 1 },
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
