@@ -16,7 +16,7 @@ return {
             jump_next = ']]',
             accept = '<CR>',
             refresh = 'gr',
-            open = '<leader>ac',
+            open = '<M-CR>',
           },
           layout = {
             position = 'bottom', -- | top | left | right | bottom |
@@ -30,6 +30,10 @@ return {
           },
         },
       }
+
+      vim.keymap.set('n', '<leader>ac', function()
+        require('copilot.panel').toggle()
+      end, { desc = 'Copilot Panel', silent = true })
     end,
   },
   {
