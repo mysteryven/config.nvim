@@ -865,17 +865,23 @@ require('lazy').setup({
 
       require('mason-lspconfig').setup {
         ensure_installed = {},
-        automatic_enable = false,
-      }
 
-      for server_name, server in pairs(servers) do
-        if server_name ~= 'rust_analyzer' then
-          local merged_capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          local resolved = vim.tbl_deep_extend('force', {}, server, { capabilities = merged_capabilities })
-          vim.lsp.config(server_name, resolved)
-          vim.lsp.enable(server_name)
-        end
-      end
+        automatic_installation = false,
+        handlers = {
+          function(server_name)
+            -- if server_name is rust_analyzer, then need avoid to set up capabilities
+            if server_name == 'rust_analyzer' then
+              return true
+            end
+            local server = servers[server_name] or {}
+            -- This handles overriding only values explicitly passed
+            -- by the server configuration above. Useful when disabling
+            -- certain features of an LSP (for example, turning off formatting for tsserver)
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            vim.lsp.config[server_name].setup(server)
+          end,
+        },
+      }
     end,
   },
 
