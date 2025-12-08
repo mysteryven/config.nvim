@@ -440,17 +440,6 @@ require('lazy').setup({
         })
       end,
     },
-    {
-      'MysticalDevil/inlay-hints.nvim',
-      event = 'LspAttach',
-      dependencies = { 'neovim/nvim-lspconfig' },
-      config = function()
-        require('inlay-hints').setup {
-          commands = { enable = true }, -- Enable InlayHints commands, include `InlayHintsToggle`, `InlayHintsEnable` and `InlayHintsDisable`
-          autocmd = { enable = true }, -- Enable the inlay hints on `LspAttach` event
-        }
-      end,
-    },
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -742,7 +731,13 @@ require('lazy').setup({
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
 
           -- Find references for the word under your cursor.
-          map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          -- Some language servers (notably rust-analyzer via rustaceanvim) were
+          -- leaving stale filter text in Telescope's prompt when jumping to
+          -- references. Explicitly reset `default_text` so the picker always
+          -- starts empty.
+          map('gr', function()
+            require('telescope.builtin').lsp_references { default_text = '' }
+          end, '[G]oto [R]eferences')
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
@@ -804,6 +799,17 @@ require('lazy').setup({
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
+      local lspconfig = vim.lsp.config
+      lspconfig('sourcekit', {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        root_dir = function(_, callback)
+          callback(require('lspconfig.util').root_pattern 'Package.swift'(vim.fn.getcwd()) or require('lspconfig.util').find_git_ancestor(vim.fn.getcwd()))
+        end,
+        cmd = { vim.trim(vim.fn.system 'xcrun -f sourcekit-lsp') },
+      })
+       vim.lsp.enable("sourcekit")
+
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -821,6 +827,7 @@ require('lazy').setup({
         eslint = {},
         cssls = {},
         html = {},
+        swiftlint = {},
         -- ...
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -829,8 +836,6 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         ts_ls = {},
-        --
-
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -916,6 +921,7 @@ require('lazy').setup({
         javascriptreact = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
         typescript = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
         typescriptreact = { 'prettierd', 'prettier', 'eslint', stop_after_first = true },
+        swift = { 'swift-format' },
       },
     },
   },
@@ -1105,8 +1111,8 @@ require('lazy').setup({
     build = ':TSUpdate',
     opts = {
       ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
+      -- Autoinstall languages that are not installed (only if tree-sitter CLI exists to avoid Swift parser errors)
+      auto_install = vim.fn.executable 'tree-sitter' == 1,
       highlight = {
         enable = true,
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
@@ -1140,9 +1146,9 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.lint',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

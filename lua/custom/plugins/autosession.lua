@@ -3,7 +3,7 @@ return {
   lazy = false,
   keys = {
     -- Will use Telescope if installed or a vim.ui.select picker otherwise
-    { '<leader>wr', '<cmd>SessionSearch<CR>', desc = 'Session search' },
+    { '<leader>wr', '<cmd>AutoSession search<CR>', desc = 'Session search' },
   },
   config = function()
     require('auto-session').setup {

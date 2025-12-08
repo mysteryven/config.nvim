@@ -4,6 +4,12 @@ return {
     version = '^5',
     lazy = false,
     config = function()
+      -- Disable rustaceanvim's own inlay hints to avoid duplicates with the global inlay-hints.nvim plugin
+      vim.g.rustaceanvim = {
+        tools = {
+          inlay_hints = { auto = false },
+        },
+      }
       -- vim.keymap.set('n', '<leader>jc', '<cmd>RustRunner<cr>', { desc = 'Jump to Cargo.toml' })
       -- vim.keymap.set('l', '<leader>re', vim.cmd.RustLsp { 'explainError' }, { desc = 'Explain Rust error' })
     end,
@@ -39,5 +45,8 @@ return {
       vim.keymap.set('n', '<leader>rb', ':Refactor extract_block<CR>', { desc = 'Refactor: Extract block' })
       vim.keymap.set('n', '<leader>rbf', ':Refactor extract_block_to_file<CR>', { desc = 'Refactor: Extract block to file' })
     end,
+  },
+  {
+    'wojciech-kulik/xcodebuild.nvim',
   },
 }
