@@ -332,15 +332,18 @@ require('lazy').setup({
   --    require('gitsigns').setup({ ... })
   --
   -- See `:help gitsigns` to understand what the configuration keys do
-  {
-    'f-person/git-blame.nvim',
-    event = 'VeryLazy',
-    config = function()
-      vim.keymap.set('n', '<leader>gc', '<cmd>GitBlameOpenCommitURL<CR>', { desc = 'Open commit URL' })
-      vim.keymap.set('n', '<leader>gf', '<cmd>GitBlameOpenFileURL<CR>', { desc = 'Open file URL' })
-      vim.keymap.set('n', '<leader>tb', '<cmd>GitBlameToggle<CR>', { desc = '[T]oggle git [B]lame' })
-    end,
-  },
+  -- {
+  --   'f-person/git-blame.nvim',
+  --   event = 'VeryLazy',
+  --   opts = {
+  --     enabled = false,
+  --   },
+  --   config = function()
+  --     vim.keymap.set('n', '<leader>gc', '<cmd>GitBlameOpenCommitURL<CR>', { desc = 'Open commit URL' })
+  --     vim.keymap.set('n', '<leader>gf', '<cmd>GitBlameOpenFileURL<CR>', { desc = 'Open file URL' })
+  --     vim.keymap.set('n', '<leader>tb', '<cmd>GitBlameToggle<CR>', { desc = '[T]oggle git [B]lame' })
+  --   end,
+  -- },
   {
     'airblade/vim-gitgutter',
     lazy = false,
@@ -385,7 +388,7 @@ require('lazy').setup({
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
       },
-      current_line_blame = true,
+      current_line_blame = false,
       on_attach = function(bufnr)
         local function map(mode, lhs, rhs, opts)
           opts = vim.tbl_extend('force', { noremap = true, silent = true }, opts or {})
@@ -555,6 +558,17 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         defaults = {
+          layout_strategy = 'flex',
+          layout_config = {
+            flex = {
+              flip_columns = 120,
+            },
+          },
+          preview = {
+            -- Telescope 0.1.x still calls legacy nvim-treesitter parser APIs
+            -- that are not available on recent nvim-treesitter main.
+            treesitter = false,
+          },
           mappings = {
             i = {
               ['<c-enter>'] = 'to_fuzzy_refine',
@@ -821,7 +835,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {},
-        gopls = {},
+        -- gopls = {},
         pyright = {},
         -- rust_analyzer = {},
         eslint = {},
@@ -1126,7 +1140,7 @@ require('lazy').setup({
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
       ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
+      require('nvim-treesitter').setup(opts)
 
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:

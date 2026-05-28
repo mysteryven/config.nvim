@@ -4,10 +4,23 @@ return {
     version = '^5',
     lazy = false,
     config = function()
-      -- Disable rustaceanvim's own inlay hints to avoid duplicates with the global inlay-hints.nvim plugin
       vim.g.rustaceanvim = {
-        tools = {
-          inlay_hints = { auto = false },
+        server = {
+          on_attach = function(_, bufnr)
+            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+          end,
+          default_settings = {
+            ['rust-analyzer'] = {
+              inlayHints = {
+                bindingModeHints = { enable = true },
+                closureReturnTypeHints = { enable = 'always' },
+                lifetimeElisionHints = {
+                  enable = 'always',
+                  useParameterNames = true,
+                },
+              },
+            },
+          },
         },
       }
       -- vim.keymap.set('n', '<leader>jc', '<cmd>RustRunner<cr>', { desc = 'Jump to Cargo.toml' })
